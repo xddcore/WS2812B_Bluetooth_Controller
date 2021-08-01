@@ -1,0 +1,436 @@
+C51 COMPILER V9.01   MAIN                                                                  10/23/2016 13:14:05 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: E:\KEIL14¿ª·¢³ÌÐò\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(E:\MDK5\C51\INC\STC) DEBUG
+                    - OBJECTEXTEND PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include<stc15.h>
+   2          //¾§ÕñÆµÂÊ20Mhz 8¼¶ÓÅ»¯
+   3          #include<intrins.h>
+   4          #define uchar unsigned char
+   5          #define uint unsigned int
+   6          #define led_number 240
+   7          sbit send_date_1=P1^1;
+   8          sbit send_date_2=P1^0;
+   9          sbit send_date_3=P1^2;
+  10          sbit send_date_4=P1^3;
+  11          sbit send_date_5=P1^4;
+  12          bit flag_uart=0;
+  13          uchar uart_date;
+  14          uchar RGB_date[8][3]={{0xff,0xff,0xff},//°×£¨×î´óÁÁ¶È£©0    255                            ×¢Òâ£º»ÆÉ«£¬³ÈÉ
+             -«²»Ö§³ÖÁÁ¶Èµ÷½Ú
+  15                               {0x00,0xff,0x00},//ºì£¨×î´óÁÁ¶È£©1
+  16                               {0xaa,0xff,0x00},//³È£¨×î´óÁÁ¶È£©2
+  17                               {0xff,0xff,0x00},//»Æ£¨×î´óÁÁ¶È£©3
+  18                               {0xff,0x00,0x00},//ÂÌ£¨×î´óÁÁ¶È£©4
+  19                               {0x00,0x00,0x00},//¹Ø±ÕÖ¸Áî5
+  20                               {0x00,0x00,0xff},//À¶£¨×î´óÁÁ¶È£©6
+  21                               {0x00,0xaa,0xff},//×Ï£¨×î´óÁÁ¶È£©7
+  22                               };//³õÊ¼Êý×é
+  23          uchar RGB_date_mix[8][3]={{0x55,0x55,0x55},//°×£¨µÍÁÁ¶È£©1       85
+  24                               {0x00,0x55,0x00},//ºì£¨µÍÁÁ¶È£©2
+  25                               {0xaa,0xff,0x00},//³È£¨µÍÁÁ¶È£©3
+  26                               {0xff,0xff,0x00},//»Æ£¨µÍÁÁ¶È£©4
+  27                               {0x55,0x00,0x00},//ÂÌ£¨µÍÁÁ¶È£©5
+  28                               {0x00,0x00,0x00},//¹Ø±ÕÖ¸Áî6
+  29                               {0x00,0x00,0x55},//À¶£¨µÍÁÁ¶È£©7
+  30                               {0x00,0xaa,0xff},//×Ï£¨µÍÁÁ¶È£©8
+  31                               };//³õÊ¼Êý×é
+  32          /*void delay()    //@20.000MHz
+  33          {
+  34            unsigned char i;
+  35          
+  36            _nop_();
+  37            i = 80;
+  38            while (--i);
+  39          }
+  40          */
+  41          void init()
+  42          {
+  43   1      //  P_SW1=0x40;//½«´®¿Ú1·Åµ½3.6 3.7
+  44   1        EA=1;
+  45   1        ES=1;
+  46   1        SCON = 0x50;    //8Î»Êý¾Ý,¿É±ä²¨ÌØÂÊ
+  47   1        AUXR |= 0x04;   //¶¨Ê±Æ÷2Ê±ÖÓÎªFosc,¼´1T
+  48   1        T2L = 0xF7;   //Éè¶¨¶¨Ê±³õÖµ
+  49   1        T2H = 0xFD;   //Éè¶¨¶¨Ê±³õÖµ
+  50   1        AUXR |= 0x01;   //´®¿Ú1Ñ¡Ôñ¶¨Ê±Æ÷2Îª²¨ÌØÂÊ·¢ÉúÆ÷
+  51   1        AUXR |= 0x10;   //Æô¶¯¶¨Ê±Æ÷2
+  52   1      }
+  53          void write_bit(uchar cn,uchar date_bit)
+C51 COMPILER V9.01   MAIN                                                                  10/23/2016 13:14:05 PAGE 2   
+
+  54          {
+  55   1      //Send_Dat=0;
+  56   1        switch(cn)
+  57   1        {
+  58   2          case 1:
+  59   2            if (date_bit==1)
+  60   2      {
+  61   3      send_date_1=1;
+  62   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  63   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  64   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  65   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  66   3      send_date_1=0;
+  67   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  68   3        }
+  69   2       else
+  70   2       {
+  71   3        send_date_1=1;
+  72   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  73   3        send_date_1=0;
+  74   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+  75   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+  76   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+  77   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+  78   3      }
+  79   2       break;
+  80   2       
+  81   2          case 2:
+  82   2            if (date_bit==1)
+  83   2      {
+  84   3      send_date_2=1;
+  85   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  86   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  87   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  88   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  89   3      send_date_2=0;
+  90   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+  91   3        }
+  92   2       else
+  93   2       {
+  94   3        send_date_2=1;
+  95   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+  96   3        send_date_2=0;
+  97   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+  98   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+  99   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 100   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 101   3      }
+ 102   2        break;
+ 103   2          case 3:
+ 104   2            if (date_bit==1)
+ 105   2      {
+ 106   3      send_date_3=1;
+ 107   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 108   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 109   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 110   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 111   3      send_date_3=0;
+ 112   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 113   3        }
+ 114   2       else
+ 115   2       {
+C51 COMPILER V9.01   MAIN                                                                  10/23/2016 13:14:05 PAGE 3   
+
+ 116   3        send_date_3=1;
+ 117   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 118   3        send_date_3=0;
+ 119   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 120   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 121   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 122   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 123   3      }
+ 124   2        break;
+ 125   2          case 4:
+ 126   2            if (date_bit==1)
+ 127   2      {
+ 128   3      send_date_4=1;
+ 129   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 130   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 131   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 132   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 133   3      send_date_4=0;
+ 134   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 135   3        }
+ 136   2       else
+ 137   2       {
+ 138   3        send_date_4=1;
+ 139   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 140   3        send_date_4=0;
+ 141   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 142   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 143   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 144   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 145   3      } 
+ 146   2        break;
+ 147   2          case 5:
+ 148   2                if (date_bit==1)
+ 149   2      {
+ 150   3      send_date_5=1;
+ 151   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 152   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 153   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 154   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 155   3      send_date_5=0;
+ 156   3        _nop_();_nop_();_nop_();_nop_();_nop_();
+ 157   3        }
+ 158   2       else
+ 159   2       {
+ 160   3        send_date_5=1;
+ 161   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 162   3        send_date_5=0;
+ 163   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 164   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 165   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 166   3         _nop_();_nop_();_nop_();_nop_();_nop_();
+ 167   3      }
+ 168   2       break; 
+ 169   2        }
+ 170   1      }
+ 171          void write_date(uchar cmd,uchar cn)//Ñ¡ÔñÊý¾Ý,Ñ¡ÔñµÆ´øÐòºÅ1 1
+ 172          {
+ 173   1          uchar i,w,h;
+ 174   1        for(i=0;i<3;i++)//ÏÈ´«Êä¸ßÎ»
+ 175   1        {
+ 176   2          w=RGB_date[cmd][i];
+ 177   2        //  w=RGB[i];
+C51 COMPILER V9.01   MAIN                                                                  10/23/2016 13:14:05 PAGE 4   
+
+ 178   2          for(h=0;h<8;h++)
+ 179   2          {
+ 180   3            w=w<<1;
+ 181   3          write_bit(cn,CY);//ÏòµÆ´øcn·¢ËÍÊý¾Ý
+ 182   3          }
+ 183   2      }
+ 184   1        }
+ 185          void write_date_mix(uchar cmd,uchar cn)//Ñ¡ÔñÊý¾Ý,Ñ¡ÔñµÆ´øÐòºÅ
+ 186          {
+ 187   1          uchar i,w,h;
+ 188   1        for(i=0;i<3;i++)//ÏÈ´«Êä¸ßÎ»
+ 189   1        {
+ 190   2          w=RGB_date_mix[cmd][i];
+ 191   2        //  w=RGB[i];
+ 192   2          for(h=0;h<8;h++)
+ 193   2          {
+ 194   3            w=w<<1;
+ 195   3          write_bit(cn,CY);//ÏòµÆ´øcn·¢ËÍÊý¾Ý
+ 196   3          }
+ 197   2      }
+ 198   1      }/*
+ 199          void qc_led(uchar cn)
+ 200          {
+ 201            uchar h;
+ 202          for(h=0;h<led_number;h++){write_date(0,cn);}delay100ms();
+ 203          delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();de
+             -lay100ms();
+ 204            delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();d
+             -elay100ms();
+ 205              for(h=0;h<led_number;h++){write_date(5,cn);}    delay100ms();
+ 206                delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms()
+             -;delay100ms();
+ 207              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 208              for(h=0;h<led_number;h++){write_date(1,cn);}delay100ms();
+ 209              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 210              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 211              for(h=0;h<led_number;h++){write_date(5,cn);}delay100ms();
+ 212              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 213              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 214              for(h=0;h<led_number;h++){write_date(2,cn);}delay100ms();
+ 215              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 216              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 217              for(h=0;h<led_number;h++){write_date(5,cn);}delay100ms();
+ 218              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 219              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 220              for(h=0;h<led_number;h++){write_date(3,cn);}delay100ms();
+ 221                  delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms(
+             -);delay100ms();
+ 222              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 223              for(h=0;h<led_number;h++){write_date(5,cn);}delay100ms();
+ 224                  delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms(
+             -);delay100ms();
+C51 COMPILER V9.01   MAIN                                                                  10/23/2016 13:14:05 PAGE 5   
+
+ 225              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 226              for(h=0;h<led_number;h++){write_date(4,cn);}delay100ms();
+ 227                  delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms(
+             -);delay100ms();
+ 228              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 229              for(h=0;h<led_number;h++){write_date(5,cn);}delay100ms();
+ 230                  delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms(
+             -);delay100ms();
+ 231              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 232              for(h=0;h<led_number;h++){write_date(6,cn);}delay100ms();
+ 233                  delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms(
+             -);delay100ms();
+ 234              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 235              for(h=0;h<led_number;h++){write_date(5,cn);}delay100ms();
+ 236                  delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms(
+             -);delay100ms();
+ 237              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 238              for(h=0;h<led_number;h++){write_date(7,cn);}delay100ms();
+ 239                  delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms(
+             -);delay100ms();
+ 240              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 241              for(h=0;h<led_number;h++){write_date(5,cn);}delay100ms();
+ 242              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 243              delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();delay100ms();
+             -delay100ms();
+ 244          }*/
+ 245          void uart_dispose()
+ 246          {
+ 247   1        uchar i;                                         /*XagentÍ¨ÐÅÐ­Òé*/
+ 248   1        uchar h;//µÆÊý                                   Ç°°ËÎ» £ºµÆ´øÐòºÅ 01£º1ºÅµÆ´ø£¬02£º¶þºÅµÆ´ø.03:3ºÅµÆ´ø 0
+             -4£ºËÄºÅµÆ´ø 05£ºÎåºÅµÆ´ø
+ 249   1        if(flag_uart==1)                                 //ºó°ËÎ»£¨Ç°ËÄÎ»£©£ºÁÁ¶ÈÑ¡Ôñ£¬0£º¸ß      2£ºµÍ
+ 250   1        {   
+ 251   2      flag_uart=0;    //  ºó°ËÎ»£¨ºóËÄÎ»£©£ºÑÕÉ«Ñ¡Ôñ£º0£º¹Ø±ÕµÆ´ø 1£º°×¹â 2£ººì¹â 3£º³È¹â 4£º»Æ¹â 5£ºÂÌ¹â  7£ºÀ¶¹â
+             - 8£º×Ï¹â
+ 252   2          switch(uart_date)
+ 253   2          {
+ 254   3          /*×Ü¿Ø²¿·Ö*/
+ 255   3            case 0x63:for(i=1;i<=5;i++){ for(h=0;h<led_number;h++){write_date(5,i);}}//ÒÀ´Î¹Ø±Õ5ÌõµÆ´øµÆ´ø
+ 256   3          /*µÆ´ø1·Ö¿Ø*/
+ 257   3            case 0x00:for(i=1;i<=1;i++){for(h=0;h<led_number;h++){write_date(5,i);}}break;//¹Ø±ÕµÆ´ø1
+ 258   3          //  case 0x16:for(i=0;i<60;i++){qc_led(1);}break;//ÉÁË¸Ä£Ê½
+ 259   3            /*¸ßÁÁ¶È²¿·Ö*/
+ 260   3            case 0x01:for(h=0;h<led_number;h++){write_date(0,1);}break;//°×¹â
+ 261   3            case 0x02:for(h=0;h<led_number;h++){write_date(1,1);}break;//ºì¹â
+ 262   3            case 0x03:for(h=0;h<led_number;h++){write_date(2,1);}break;//³È¹â
+ 263   3            case 0x04:for(h=0;h<led_number;h++){write_date(3,1);}break;//»Æ¹â
+ 264   3            case 0x06:for(h=0;h<led_number;h++){write_date(4,1);}break;//ÂÌ¹â
+ 265   3            case 0x07:for(h=0;h<led_number;h++){write_date(6,1);}break;//À¶¹â
+ 266   3            case 0x08:for(h=0;h<led_number;h++){write_date(7,1);}break;//×Ï¹â
+ 267   3        /*    /*µÍÁÁ¶È²¿·Ö*/
+ 268   3            case 0x09:for(h=0;h<led_number;h++){write_date_mix(0,1);}break;//°×¹â
+ 269   3            case 0x0a:for(h=0;h<led_number;h++){write_date_mix(1,1);}break;//ºì¹â
+ 270   3            case 0x0b:for(h=0;h<led_number;h++){write_date_mix(2,1);}break;//³È¹â
+ 271   3            case 0x0c:for(h=0;h<led_number;h++){write_date_mix(3,1);}break;//»Æ¹â
+C51 COMPILER V9.01   MAIN                                                                  10/23/2016 13:14:05 PAGE 6   
+
+ 272   3            case 0x0d:for(h=0;h<led_number;h++){write_date_mix(4,1);}break;//ÂÌ¹â
+ 273   3            case 0x0e:for(h=0;h<led_number;h++){write_date_mix(6,1);}break;//À¶¹â
+ 274   3            case 0x0f:for(h=0;h<led_number;h++){write_date_mix(7,1);}break;//×Ï¹â
+ 275   3            /*µÆ´ø2·Ö¿Ø*/
+ 276   3            case 0x14:for(i=2;i<=2;i++){ for(h=1;h<led_number;h++){write_date(5,i);}}break;//¹Ø±ÕµÆ´ø2
+ 277   3        //    case 0x35:for(i=0;i<60;i++){qc_led(2);}break;//ÉÁË¸Ä£Ê½
+ 278   3            /*¸ßÁÁ¶È²¿·Ö*/
+ 279   3            case 0x15:for(h=0;h<led_number;h++){write_date(0,2);}break;//°×¹â
+ 280   3            case 0x16:for(h=0;h<led_number;h++){write_date(1,2);}break;//ºì¹â
+ 281   3            case 0x17:for(h=0;h<led_number;h++){write_date(2,2);}break;//³È¹â
+ 282   3            case 0x18:for(h=0;h<led_number;h++){write_date(3,2);}break;//»Æ¹â
+ 283   3            case 0x19:for(h=0;h<led_number;h++){write_date(4,2);}break;//ÂÌ¹â
+ 284   3            case 0x1a:for(h=0;h<led_number;h++){write_date(6,2);}break;//À¶¹â
+ 285   3            case 0x1b:for(h=0;h<led_number;h++){write_date(7,2);}break;//×Ï¹â
+ 286   3            //µÍÁÁ¶È²¿·Ö
+ 287   3            case 0x1c:for(h=0;h<led_number;h++){write_date_mix(0,2);}break;//°×¹â
+ 288   3            case 0x1d:for(h=0;h<led_number;h++){write_date_mix(1,2);}break;//ºì¹â
+ 289   3            case 0x1e:for(h=0;h<led_number;h++){write_date_mix(2,2);}break;//³È¹â
+ 290   3            case 0x1f:for(h=0;h<led_number;h++){write_date_mix(3,2);}break;//»Æ¹â
+ 291   3            case 0x20:for(h=0;h<led_number;h++){write_date_mix(4,2);}break;//ÂÌ¹â
+ 292   3            case 0x21:for(h=0;h<led_number;h++){write_date_mix(6,2);}break;//À¶¹â
+ 293   3            case 0x22:for(h=0;h<led_number;h++){write_date_mix(7,2);}break;//×Ï¹â
+ 294   3            /*µÆ´ø3·Ö¿Ø*/
+ 295   3            case 0x28:for(i=3;i<=3;i++){ for(h=1;h<led_number;h++){write_date(5,i);}}break;//¹Ø±ÕµÆ´ø3
+ 296   3        //    case 0x55:for(i=0;i<60;i++){qc_led(3);}break;//ÉÁË¸Ä£Ê½
+ 297   3            /*¸ßÁÁ¶È²¿·Ö*/
+ 298   3            case 0x29:for(h=0;h<led_number;h++){write_date(0,3);}break;//°×¹â
+ 299   3            case 0x2a:for(h=0;h<led_number;h++){write_date(1,3);}break;//ºì¹â
+ 300   3            case 0x2b:for(h=0;h<led_number;h++){write_date(2,3);}break;//³È¹â
+ 301   3            case 0x2c:for(h=0;h<led_number;h++){write_date(3,3);}break;//»Æ¹â
+ 302   3            case 0x2d:for(h=0;h<led_number;h++){write_date(4,3);}break;//ÂÌ¹â
+ 303   3            case 0x2e:for(h=0;h<led_number;h++){write_date(6,3);}break;//À¶¹â
+ 304   3            case 0x2f:for(h=0;h<led_number;h++){write_date(7,3);}break;//×Ï¹â
+ 305   3            /*µÍÁÁ¶È²¿·Ö*/
+ 306   3            case 0x30:for(h=0;h<led_number;h++){write_date_mix(0,3);}break;//°×¹â
+ 307   3            case 0x31:for(h=0;h<led_number;h++){write_date_mix(1,3);}break;//ºì¹â
+ 308   3            case 0x32:for(h=0;h<led_number;h++){write_date_mix(2,3);}break;//³È¹â
+ 309   3            case 0x33:for(h=0;h<led_number;h++){write_date_mix(3,3);}break;//»Æ¹â
+ 310   3            case 0x34:for(h=0;h<led_number;h++){write_date_mix(4,3);}break;//ÂÌ¹â
+ 311   3            case 0x35:for(h=0;h<led_number;h++){write_date_mix(6,3);}break;//À¶¹â
+ 312   3            case 0x36:for(h=0;h<led_number;h++){write_date_mix(7,3);}break;//×Ï¹â*/
+ 313   3            /*µÆ´ø4·Ö¿Ø*/
+ 314   3            case 0x3c:for(i=4;i<=4;i++){ for(h=1;h<led_number;h++){write_date(5,i);}}break;//¹Ø±ÕµÆ´ø4
+ 315   3          //  case 0x75:for(i=0;i<60;i++){qc_led(4);}break;//ÉÁË¸Ä£Ê½
+ 316   3            /*¸ßÁÁ¶È²¿·Ö*/
+ 317   3            case 0x3d:for(h=0;h<led_number;h++){write_date(0,4);}break;//°×¹â
+ 318   3            case 0x3e:for(h=0;h<led_number;h++){write_date(1,4);}break;//ºì¹â
+ 319   3            case 0x3f:for(h=0;h<led_number;h++){write_date(2,4);}break;//³È¹â
+ 320   3            case 0x40:for(h=0;h<led_number;h++){write_date(3,4);}break;//»Æ¹â
+ 321   3            case 0x41:for(h=0;h<led_number;h++){write_date(4,4);}break;//ÂÌ¹â
+ 322   3            case 0x42:for(h=0;h<led_number;h++){write_date(6,4);}break;//À¶¹â
+ 323   3            case 0x43:for(h=0;h<led_number;h++){write_date(7,4);}break;//×Ï¹â
+ 324   3            //µÍÁÁ¶È²¿·Ö
+ 325   3            case 0x44:for(h=0;h<led_number;h++){write_date_mix(0,4);}break;//°×¹â
+ 326   3            case 0x45:for(h=0;h<led_number;h++){write_date_mix(1,4);}break;//ºì¹â
+ 327   3            case 0x46:for(h=0;h<led_number;h++){write_date_mix(2,4);}break;//³È¹â
+ 328   3            case 0x47:for(h=0;h<led_number;h++){write_date_mix(3,4);}break;//»Æ¹â
+ 329   3            case 0x48:for(h=0;h<led_number;h++){write_date_mix(4,4);}break;//ÂÌ¹â
+ 330   3            case 0x49:for(h=0;h<led_number;h++){write_date_mix(6,4);}break;//À¶¹â
+ 331   3            case 0x4a:for(h=0;h<led_number;h++){write_date_mix(7,4);}break;
+ 332   3            /*µÆ´ø5·Ö¿Ø*/
+ 333   3            case 0x50:for(i=5;i<=5;i++){ for(h=1;h<led_number;h++){write_date(5,i);}}break;//¹Ø±ÕµÆ´ø5
+C51 COMPILER V9.01   MAIN                                                                  10/23/2016 13:14:05 PAGE 7   
+
+ 334   3      //      case 0x95:for(i=0;i<60;i++){qc_led(5);}break;//ÉÁË¸Ä£Ê½
+ 335   3            /*¸ßÁÁ¶È²¿·Ö*/
+ 336   3            case 0x51:for(h=0;h<led_number;h++){write_date(0,5);}break;//°×¹â
+ 337   3            case 0x52:for(h=0;h<led_number;h++){write_date(1,5);}break;//ºì¹â
+ 338   3            case 0x53:for(h=0;h<led_number;h++){write_date(2,5);}break;//³È¹â
+ 339   3            case 0x54:for(h=0;h<led_number;h++){write_date(3,5);}break;//»Æ¹â
+ 340   3            case 0x55:for(h=0;h<led_number;h++){write_date(4,5);}break;//ÂÌ¹â
+ 341   3            case 0x56:for(h=0;h<led_number;h++){write_date(6,5);}break;//À¶¹â
+ 342   3            case 0x57:for(h=0;h<led_number;h++){write_date(7,5);}break;//×Ï¹â
+ 343   3        //  µÍÁÁ¶È²¿·Ö
+ 344   3            case 0x58:for(h=0;h<led_number;h++){write_date_mix(0,5);}break;//°×¹â
+ 345   3            case 0x59:for(h=0;h<led_number;h++){write_date_mix(1,5);}break;//ºì¹â
+ 346   3      //      case 0x53:for(h=0;h<led_number;h++){write_date_mix(2,5);}break;//³È¹â
+ 347   3        //    case 0x54:for(h=0;h<led_number;h++){write_date_mix(3,5);}break;//»Æ¹â
+ 348   3            case 0x5c:for(h=0;h<led_number;h++){write_date_mix(4,5);}break;//ÂÌ¹â
+ 349   3            case 0x5d:for(h=0;h<led_number;h++){write_date_mix(6,5);}break;//À¶¹â
+ 350   3        //    case 0x57:for(h=0;h<led_number;h++){write_date_mix(7,5);}break;//×Ï¹â
+ 351   3            default:break;
+ 352   3            }
+ 353   2          }
+ 354   1        }
+ 355          void uart_1() interrupt 4
+ 356          {
+ 357   1        //while(!RI);
+ 358   1          RI=0;
+ 359   1        uart_date=SBUF;
+ 360   1        flag_uart=1;
+ 361   1      }
+ 362          void main()
+ 363          {
+ 364   1        init();
+ 365   1        while(1)
+ 366   1        {
+ 367   2      uart_dispose();
+ 368   2          }
+ 369   1        } 
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2188    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     49       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
