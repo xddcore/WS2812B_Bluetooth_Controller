@@ -22,4 +22,4 @@
 ![show_2](http://cdn.chiselos.com/white_display.jpg)
 
 ### 讲解视频
-Http(待补充b站视频)
+https://www.bilibili.com/video/BV1Fq4y197Be/
